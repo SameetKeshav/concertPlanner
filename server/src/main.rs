@@ -12,7 +12,7 @@ use mongodb::{
 #[get("/user/{userId}")]
 async fn get_user(user_id: web::Path<String>, client: web::Data<Client>) -> impl Responder {
     let collection: Collection<User> = client
-        .database(std::env::var("MONGODB_URI").unwrap())
+        .database(std::env::var("MONGODB_DB").unwrap().as_str())
         .collection("users");
     match collection
         .find_one(
