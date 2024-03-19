@@ -1,8 +1,8 @@
 pub mod dto;
 pub mod models;
-pub mod user;
+pub mod service;
 
-use crate::user::get_user::get_user_handler;
+use crate::service::user::get_user_handler::get_user_handler;
 
 use actix_web::{
     get,
