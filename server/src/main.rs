@@ -1,33 +1,20 @@
 pub mod dto;
-use std::str::FromStr;
+pub mod models;
+pub mod user;
 
-use crate::dto::user_dto::User;
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use dotenv::dotenv;
-use mongodb::{
-    bson::{doc, oid::ObjectId},
-    Client, Collection,
+use crate::user::get_user::get_user_handler;
+
+use actix_web::{
+    get,
+    web::{self},
+    App, HttpServer, Responder,
 };
+use dotenv::dotenv;
+use mongodb::Client;
 
 #[get("/user/{userId}")]
 async fn get_user(user_id: web::Path<String>, client: web::Data<Client>) -> impl Responder {
-    let collection: Collection<User> = client
-        .database(std::env::var("MONGODB_DB").unwrap().as_str())
-        .collection("users");
-    match collection
-        .find_one(
-            doc! { "_id": ObjectId::from_str(user_id.as_str()).unwrap() },
-            None,
-        )
-        .await
-    {
-        Ok(Some(user)) => HttpResponse::Ok().json(user),
-        Ok(None) => HttpResponse::NotFound().body("User} not found"),
-        Err(err) => {
-            println!("{}", err);
-            HttpResponse::InternalServerError().body("Something went wrong")
-        }
-    }
+    get_user_handler(user_id, client).await
 }
 
 #[actix_web::main]
